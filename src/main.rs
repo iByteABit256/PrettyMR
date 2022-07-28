@@ -6,7 +6,8 @@ fn create_message(input_map: HashMap<String, Vec<String>>) -> Option<String> {
     let mut msg = String::from("MR ");
 
     for (key, val) in input_map.iter() {
-        msg.push_str(&("Issue-".to_owned() + key + " ("));
+        // TODO: add configuration file to be able to set custom prefix on issue names
+        msg.push_str(&("".to_owned() + key + " ("));
         
         for (i, item) in val.iter().enumerate() {
             let num = item.rsplit_once("/")?.1;
@@ -76,8 +77,8 @@ mod tests {
         let url2 = String::from("https://gitlab.com/username.com/foo/-/merge_requests/132");
         let url3 = String::from("https://gitlab.com/username.com/foo/-/merge_requests/153");
         let mut map = HashMap::new();
-        let key1 = String::from("13845");
-        let key2 = String::from("141");
+        let key1 = String::from("Issue-13845");
+        let key2 = String::from("Issue-141");
 
         let expected = format!("MR Issue-13845 (bla: [!13]({}), foo: [!132]({})) Issue-141 (foo: [!153]({}))", &url1, &url2, &url3);
         map.insert(key1, vec![url1, url2]);
