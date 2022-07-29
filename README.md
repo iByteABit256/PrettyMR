@@ -1,5 +1,5 @@
 # PrettyMR
-Takes Gitlab URLs as input along with the corresponding issue names and generates a message for messaging platforms
+Takes Gitlab Merge Request URLs as input along with the corresponding issue names and generates a message for messaging platforms
 
 ## Usage
 
@@ -10,7 +10,7 @@ Takes Gitlab URLs as input along with the corresponding issue names and generate
 ### Example
 
 ```
-./prettymr Issue-134 https://gitlab.com/username.com/bla/-/merge_requests/13 https://gitlab.com/username.com/foo/-/merge_requests/132 Issue-21 https://gitlab.com/username.com/foo/-/merge_requests/153
+./prettymr Issue-134: https://gitlab.com/username.com/bla/-/merge_requests/13 https://gitlab.com/username.com/foo/-/merge_requests/132 Issue-21: https://gitlab.com/username.com/foo/-/merge_requests/153
 ```
 
 This will produce:
