@@ -1,5 +1,4 @@
-use std::env;
-use std::collections::HashMap;
+use std::env; use std::collections::HashMap;
 use colored::Colorize;
 
 fn create_message(input_map: HashMap<String, Vec<String>>) -> Option<String> {
@@ -29,8 +28,8 @@ fn create_input_map(args: Vec<String>) -> HashMap<String, Vec<String>>{
     let mut input_map = HashMap::new();
     let mut last_key = String::new();
 
-    for arg in args.iter() {
-        if arg.to_owned().pop().unwrap() == ':' {
+    for mut arg in args.into_iter() {
+        if arg.pop().unwrap() == ':' {
             last_key = arg.to_string();
             input_map.entry(last_key.clone()).or_insert(Vec::new());
         } else {
@@ -68,7 +67,7 @@ mod tests {
 
         let res = create_input_map(args);
         assert_eq!(1, res.len());
-        assert_eq!(2, res.get("13845:".into()).unwrap().len());
+        assert_eq!(2, res.get("13845".into()).unwrap().len());
     }
     
     #[test]
