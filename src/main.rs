@@ -15,7 +15,6 @@ impl Default for Config {
 
 fn change_issue_prefix(prefix: String) -> Result<String, confy::ConfyError> {
     let new_config = Config { issue_prefix: prefix.clone() };
-    println!("{:#?}", new_config);
     confy::store("prettymr", new_config)?;
 
     Ok(prefix)
