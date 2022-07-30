@@ -21,3 +21,26 @@ MR Issue-134 (bla: [!13](https://gitlab.com/username.com/bla/-/merge_requests/13
 Example Output in Slack
 
 ![Slack Demo](resources/slack-demo.png)
+
+## Configuration
+
+```
+./prettymr --setprefix [IssuePrefix]
+```
+
+### Example
+
+```
+./prettymr --setprefix Issue-
+```
+
+This prefixes 'Issue-' to all issue names. For example this
+```
+./prettymr 134: https://gitlab.com/username.com/bla/-/merge_requests/13 https://gitlab.com/username.com/foo/-/merge_requests/132 21: https://gitlab.com/username.com/foo/-/merge_requests/153
+```
+
+will produce
+```
+MR Issue-134 (bla: [!13](https://gitlab.com/username.com/bla/-/merge_requests/13), foo: [!132](https://gitlab.com/username.com/foo/-/merge_requests/132)) Issue-21 (foo: [!153](https://gitlab.com/username.com/foo/-/merge_requests/153))
+```
+

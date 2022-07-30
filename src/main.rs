@@ -1,12 +1,31 @@
-use std::env; use std::collections::HashMap;
+use std::env;
+use std::collections::HashMap;
 use colored::Colorize;
+use serde::{Serialize, Deserialize};
 
-fn create_message(input_map: HashMap<String, Vec<String>>) -> Option<String> {
+#[derive(Serialize, Deserialize, Debug)]
+struct Config {
+    issue_prefix: String,
+}
+
+/// `Config` implements `Default`
+impl Default for Config {
+    fn default() -> Self { Self { issue_prefix: "".into() } }
+}
+
+fn change_issue_prefix(prefix: String) -> Result<String, confy::ConfyError> {
+    let new_config = Config { issue_prefix: prefix.clone() };
+    println!("{:#?}", new_config);
+    confy::store("prettymr", new_config)?;
+
+    Ok(prefix)
+}
+
+fn create_message(cfg: Config, input_map: HashMap<String, Vec<String>>) -> Option<String> {
     let mut msg = String::from("MR ");
 
     for (key, val) in input_map.iter() {
-        // TODO: add configuration file to be able to set custom prefix on issue names
-        msg.push_str(&("".to_owned() + key + " ("));
+        msg.push_str(&(cfg.issue_prefix.to_owned() + key + " ("));
         
         for (i, item) in val.iter().enumerate() {
             let num = item.rsplit_once("/")?.1;
@@ -27,9 +46,23 @@ fn create_message(input_map: HashMap<String, Vec<String>>) -> Option<String> {
 fn create_input_map(args: Vec<String>) -> HashMap<String, Vec<String>>{
     let mut input_map = HashMap::new();
     let mut last_key = String::new();
+    let mut prefix_flag_exists = false;
 
-    for mut arg in args.into_iter() {
-        if arg.chars().last().unwrap() == ':' {
+    for mut arg in args.into_iter() { if prefix_flag_exists {
+            match change_issue_prefix(arg) {
+                Ok(pfx) => println!("Changed issue prefix to: {}", pfx),
+                Err(_) => eprintln!("Error while changing issue prefix"),
+            }
+            std::process::exit(0); 
+        } else if arg == "--setprefix" {
+            prefix_flag_exists = true;
+        } else if arg == "--unsetprefix" {
+            match confy::store("prettymr", Config::default()) {
+                Ok(_) => println!("Unset issue prefix"),
+                Err(_) => eprintln!("Error while unsetting issue prefix"),
+            }
+            std::process::exit(0); 
+        } else if arg.chars().last().unwrap() == ':' {
             arg.pop();
             last_key = arg.to_string();
             input_map.entry(last_key.clone()).or_insert(Vec::new());
@@ -44,15 +77,18 @@ fn create_input_map(args: Vec<String>) -> HashMap<String, Vec<String>>{
     input_map
 }
 
-fn main() {
+fn main() -> Result<(), confy::ConfyError>{
     let args: Vec<String> = env::args().skip(1).collect();
+    let cfg = confy::load("prettymr")?;
     let input_map = create_input_map(args);
 
-    let message = create_message(input_map);
+    let message = create_message(cfg, input_map);
     match message {
         Some(msg) => println!("\nHere is your message: {}", msg.green().underline()),
         None => eprintln!("Invalid URL(s) given"),
     }
+
+    Ok(())
 }
 
 #[cfg(test)]
@@ -79,12 +115,14 @@ mod tests {
         let mut map = HashMap::new();
         let key1 = String::from("Issue-13845");
         let key2 = String::from("Issue-141");
+        let cfg: Config = confy::load("prettymr").unwrap();
+        let prefix = &cfg.issue_prefix;
 
-        let expected = format!("MR Issue-13845 (bla: [!13]({}), foo: [!132]({})) Issue-141 (foo: [!153]({}))", &url1, &url2, &url3);
+        let expected = format!("MR {}Issue-13845 (bla: [!13]({}), foo: [!132]({})) Issue-141 (foo: [!153]({}))", &prefix, &url1, &url2, &url3);
         map.insert(key1, vec![url1, url2]);
         map.insert(key2, vec![url3]);
 
-        assert_eq!(Some(expected), create_message(map))
+        assert_eq!(Some(expected), create_message(cfg, map))
     }
 }
 
