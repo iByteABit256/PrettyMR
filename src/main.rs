@@ -29,7 +29,8 @@ fn create_input_map(args: Vec<String>) -> HashMap<String, Vec<String>>{
     let mut last_key = String::new();
 
     for mut arg in args.into_iter() {
-        if arg.pop().unwrap() == ':' {
+        if arg.chars().last().unwrap() == ':' {
+            arg.pop();
             last_key = arg.to_string();
             input_map.entry(last_key.clone()).or_insert(Vec::new());
         } else {
