@@ -50,7 +50,7 @@ fn main() {
 
     let message = create_message(input_map);
     match message {
-        Some(msg) => println!("Here is your message: {}", msg.green().underline()),
+        Some(msg) => println!("\nHere is your message: {}", msg.green().underline()),
         None => eprintln!("Invalid URL(s) given"),
     }
 }
